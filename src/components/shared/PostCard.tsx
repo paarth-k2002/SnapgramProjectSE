@@ -15,7 +15,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
   const [comments, setComments] = useState<string[]>(post.comments || []);
   const [comment, setComment] = useState<string>("");
-  const [postState, setPost] = useState<Models.Document | null>(null);
+  const [, setPost] = useState<Models.Document | null>(null);
 
   const updatePostData = async (postId: string | undefined) => {
     try {
@@ -35,9 +35,7 @@ const PostCard = ({ post }: PostCardProps) => {
     try {
       if (!commentText.trim()) return;
 
-      const response = await addCommentToPost(postId, commentText);
-
-      const updatedPost = response.data;
+      await addCommentToPost(postId, commentText);
 
       setComments([...comments, commentText]);
 
