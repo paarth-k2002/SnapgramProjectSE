@@ -31,11 +31,15 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
 
-  const handleSubmitComment = async (postId: string, commentText: string) => {
+  const handleSubmitComment = async (
+    postId: string,
+    commentText: string,
+    commentUser: string
+  ) => {
     try {
       if (!commentText.trim()) return;
 
-      await addCommentToPost(postId, commentText);
+      await addCommentToPost(postId, commentText, commentUser);
 
       setComments([...comments, commentText]);
 
@@ -114,18 +118,38 @@ const PostCard = ({ post }: PostCardProps) => {
 
       <PostStats post={post} userId={user.id} />
 
-      <div className="comment-list">
+      {/* <div className="comment-list flex-col">
+        {post.commentsId.map((commentidname: string | null | undefined) => (
+          <div className="comment italic border border-pink-400 rounded px-2 py-0.5 m-2">
+            <p>{commentidname}</p>
+          </div>
+        ))}
         {post.comments.map((comment: string | null | undefined) => (
           <div className="comment italic border border-pink-400 rounded px-2 py-0.5 m-2">
             <p>{comment}</p>
           </div>
         ))}
+      </div> */}
+
+      <div className="comment-list flex-col">
+        {post.commentsId.map(
+          (commentId: string | null | undefined, index: number) => (
+            <div
+              className="flex comment border border-pink-400 rounded px-2 py-0.5 m-2"
+              key={index}>
+              <p className="italic font-bold text-green-200">{`${commentId} :`}</p>
+              {post.comments[index] && ( // Check if corresponding comment exists
+                <p className="ml-2">{post.comments[index]}</p>
+              )}
+            </div>
+          )
+        )}
       </div>
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmitComment(post.$id, comment);
+          handleSubmitComment(post.$id, comment, user.name);
         }}
         className="mt-4 flex">
         <img

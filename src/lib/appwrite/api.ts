@@ -548,7 +548,11 @@ export async function updateUser(user: IUpdateUser) {
   }
 }
 
-export async function addCommentToPost(postId: string, commentText: string) {
+export async function addCommentToPost(
+  postId: string,
+  commentText: string,
+  commentsIDText: string
+) {
   try {
     // Fetch the post document from the database
     const post = await databases.getDocument(
@@ -561,14 +565,18 @@ export async function addCommentToPost(postId: string, commentText: string) {
     if (!post) {
       throw new Error("Post not found");
     }
-    console.log(1);
+    //console.log(1);
 
     // Get the current comments array from the post document
     const commentsArray = post.comments || [];
-    console.log(commentsArray);
+    //console.log(commentsArray);
 
     // Add the new comment to the comments array
     commentsArray.push(commentText);
+
+    const commentsIdArray = post.commentsId || [];
+
+    commentsIdArray.push(commentsIDText);
 
     // Update the post document with the new comments array
     const updatedPost = await databases.updateDocument(
@@ -577,6 +585,7 @@ export async function addCommentToPost(postId: string, commentText: string) {
       postId,
       {
         comments: commentsArray,
+        commentsId: commentsIdArray,
       }
     );
 
@@ -587,6 +596,51 @@ export async function addCommentToPost(postId: string, commentText: string) {
     return updatedPost;
   } catch (error) {
     console.error("Error adding comment to post:", error);
+    throw error;
+  }
+}
+
+//###################################
+
+export async function addCommentId(postId: string, userId: string) {
+  try {
+    // Fetch the post document from the database
+    const post = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId
+    );
+    //console.log(commentText);
+
+    if (!post) {
+      throw new Error("Post not found");
+    }
+    //console.log(1);
+
+    // Get the current comments array from the post document
+    const commentsIdArray = post.commentsId || [];
+    //console.log(commentsArray);
+
+    // Add the new comment to the comments array
+    commentsIdArray.push(userId);
+
+    // Update the post document with the new comments array
+    const updatedPost = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId,
+      {
+        comments: commentsIdArray,
+      }
+    );
+
+    if (!updatedPost) {
+      throw new Error("Failed to update post");
+    }
+
+    return updatedPost;
+  } catch (error) {
+    console.error("Error adding comment id:", error);
     throw error;
   }
 }
